@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FFC800">
+  <title>Happee Fast Fast</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <header class="app-header">
+    <div class="logo-container">
+      <img src="logo.svg" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+      <span class="wordmark">Happee <span class="yellow-text">Fast Fast</span></span>
+    </div>
+  </header>
+
+  <main class="app-main" id="home-view">
+    <h1>Food, groceries and takeaways.<br><span class="yellow-text">Fast fast.</span></h1>
+    <p class="subtitle">Delivered to your door. R35 flat, R100 minimum.</p>
+
+    <div class="category-scroll">
+      <button class="chip active">All</button>
+      <button class="chip">Groceries</button>
+      <button class="chip">Restaurants</button>
+      <button class="chip">Takeaways</button>
+      <button class="chip">Essentials</button>
+    </div>
+
+    <div id="product-grid" class="product-grid"></div>
+  </main>
+
+  <!-- Profile View -->
+  <main class="app-main" id="profile-view" style="display: none;">
+    <h1>Your Profile</h1>
+    <p class="subtitle">Manage your details here.</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
+      <div>
+        <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">Full Name (From Google)</label>
+        <input type="text" id="user-name-display" class="form-input" disabled style="background: var(--gray-100);">
+      </div>
+      <div>
+        <label style="font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;">WhatsApp Number</label>
+        <input type="tel" id="profile-phone" placeholder="e.g. 0821234567" class="form-input">
+      </div>
+      <button id="save-profile-btn" class="btn-brand" style="margin-top: 8px;">Save Details</button>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active" id="nav-home">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Browse</span>
+    </a>
+    <a href="#" class="nav-item" id="cart-nav">
+      <div style="position: relative;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span id="cart-count" style="display: none; position: absolute; top: -5px; right: -8px; background: var(--yellow); color: var(--black); font-size: 10px; font-weight: 800; height: 16px; width: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">0</span>
+      </div>
+      <span>Cart</span>
+    </a>
+    <a href="#" class="nav-item" id="nav-profile">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span>You</span>
+    </a>
+  </nav>
+
+  <!-- Cart Modal Overlay -->
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button id="close-cart" class="close-btn">&times;</button>
+    </div>
+    
+    <div id="cart-items-container" class="cart-items"></div>
+
+    <div class="cart-summary">
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">R0.00</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery Fee</span>
+        <span>R35.00</span>
+      </div>
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <span id="cart-total">R0.00</span>
+      </div>
+      
+      <div id="minimum-warning" class="minimum-warning">
+        Add R<span id="minimum-diff">0.00</span> more to reach the R100 minimum.
+      </div>
+
+      <button id="checkout-btn" class="btn-brand" style="margin-top: 16px;">Go to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal Overlay -->
+  <div id="checkout-modal" class="cart-modal">
+    <div class="cart-header">
+      <h2>Checkout</h2>
+      <button id="close-checkout" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="cart-items">
+      
+      <!-- Delivery Details -->
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Delivery Address</h3>
+        <input type="text" id="address-search" placeholder="Enter your full delivery address..." class="form-input">
+      </div>
+
+      <!-- Order Summary -->
+      <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Order Summary</h3>
+      <div id="checkout-items" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Items will go here -->
+      </div>
+    </div>
+
+    <!-- Totals & Action -->
+    <div class="cart-summary">
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span id="checkout-subtotal">R0.00</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery Fee</span>
+        <span>R35.00</span>
+      </div>
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <span id="checkout-total">R0.00</span>
+      </div>
+      
+      <button id="place-order-btn" class="btn-brand" style="margin-top: 16px;">Place Order</button>
+    </div>
+  </div>
+
+  <!-- Sign Up Modal Overlay -->
+  <div id="signup-modal" class="cart-modal">
+    <div class="cart-header">
+      <h2>Welcome to Happee</h2>
+    </div>
+    
+    <div class="cart-items" style="justify-content: center;">
+      <div style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+        <p class="subtitle" style="margin-bottom: 8px; text-align: center;">Sign in to start ordering.</p>
+        
+        <button id="google-login-btn" class="btn-ghost" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; height: 20px;">
+          Sign in with Google
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBjvQGB_5zXeUZx2GZhIJlGJUWFWjiFMbs",
+      authDomain: "happee-fast-fast.firebaseapp.com",
+      projectId: "happee-fast-fast",
+      storageBucket: "happee-fast-fast.firebasestorage.app",
+      messagingSenderId: "325847242053",
+      appId: "1:325847242053:web:8cdd2818a9bb16874e5a2c",
+      measurementId: "G-RGGPZ7BK9N"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseProvider = provider;
+    window.firebaseSignIn = signInWithPopup;
+  </script>
+
+  <script src="app.js"></script>
+</body>
+</html>

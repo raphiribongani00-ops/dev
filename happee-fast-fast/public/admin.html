@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happee Admin - Orders</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: #f4f4f5; padding: 20px; font-family: 'Inter', sans-serif; max-width: 100%; }
+    
+    .order-card { 
+      background: white; 
+      border-radius: 12px; 
+      padding: 20px; 
+      margin-bottom: 20px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      max-width: 500px;
+    }
+    
+    .order-header { 
+      display: flex; 
+      justify-content: space-between; 
+      border-bottom: 1px solid #eee; 
+      padding-bottom: 12px; 
+      margin-bottom: 16px; 
+    }
+    
+    .status-badge { 
+      background: #FFC800; 
+      padding: 4px 8px; 
+      border-radius: 4px; 
+      font-size: 12px; 
+      font-weight: 800; 
+      height: fit-content;
+      text-transform: uppercase;
+    }
+    
+    .customer-info {
+      font-size: 14px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .items-list {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .item-row { 
+      display: flex; 
+      justify-content: space-between; 
+      font-size: 14px; 
+      margin-bottom: 8px; 
+    }
+    
+    .item-row span:first-child {
+      color: #333;
+    }
+
+    .item-row span:last-child {
+      font-weight: 600;
+      color: #0A0A0A;
+    }
+
+    /* The Math Breakdown (Mr D Style) */
+    .totals-box {
+      background: #0A0A0A;
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+
+    .total-row { 
+      display: flex; 
+      justify-content: space-between; 
+      font-size: 14px; 
+      margin-bottom: 8px;
+      color: #A1A1AA;
+    }
+    
+    .total-row span:last-child {
+      color: white;
+    }
+
+    .grand-total { 
+      display: flex; 
+      justify-content: space-between;
+      font-weight: 800; 
+      font-size: 18px;
+      border-top: 1px solid #333; 
+      padding-top: 12px; 
+      margin-top: 12px; 
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 20px;">Incoming Orders</h1>
+  <div id="orders-container">
+    <p>Loading orders...</p>
+  </div>
+
+  <script>
+    async function loadOrders() {
+      try {
+        const response = await fetch('http://localhost:4000/api/orders');
+        const orders = await response.json();
+        const container = document.getElementById('orders-container');
+
+        if (orders.length === 0) {
+          container.innerHTML = '<p>No orders yet.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        orders.forEach(order => {
+          const date = new Date(order.createdAt).toLocaleString('en-ZA', {
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+          
+          const card = document.createElement('div');
+          card.className = 'order-card';
+          
+          // Generate the items list
+          let itemsHtml = order.items.map(item => 
+            `<div class="item-row">
+              <span>${item.quantity}x ${item.name}</span>
+              <span>R${(item.price * item.quantity).toFixed(2)}</span>
+            </div>`
+          ).join('');
+
+          // Generate the math breakdown
+          card.innerHTML = `
+            <div class="order-header">
+              <div>
+                <strong style="font-size: 16px;">${order.customer.name}</strong><br>
+                <small style="color: #71717A;">${date}</small>
+              </div>
+              <span class="status-badge">${order.status}</span>
+            </div>
+
+            <div class="customer-info">
+              <strong>Deliver to:</strong><br>
+              ${order.deliveryAddress}<br>
+              <strong>Phone:</strong> ${order.customer.phone || 'N/A'}
+            </div>
+
+            <div class="items-list">
+              ${itemsHtml}
+            </div>
+
+            <div class="totals-box">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <span>R${order.subtotal.toFixed(2)}</span>
+              </div>
+              <div class="total-row">
+                <span>Delivery Fee</span>
+                <span>R${order.deliveryFee.toFixed(2)}</span>
+              </div>
+              <div class="grand-total">
+                <span>Total</span>
+                <span>R${order.total.toFixed(2)}</span>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error(error);
+        document.getElementById('orders-container').innerHTML = '<p style="color:red;">Failed to load orders. Is the backend running?</p>';
+      }
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>
